@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Readers' Circle – Virtual Book Club</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== Base ===== */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Roboto',sans-serif;background:#f7f7f7;color:#222;transition:background 0.3s,color 0.3s;}
+a{text-decoration:none;color:inherit;}
+h1,h2,h3,h4{margin-bottom:0.5rem;}
+
+/* ===== Header ===== */
+header{
+  display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:#5d4fb2;color:#fff;
+  flex-wrap:wrap;box-shadow:0 4px 10px rgba(0,0,0,0.2);transition:background 0.3s;
+}
+header h1{font-size:1.8rem;font-weight:700;}
+nav a{margin-left:1.5rem;font-weight:500;transition:color 0.3s;}
+nav a:hover{color:#ffeb3b;}
+#toggleDark{cursor:pointer;}
+
+/* ===== Hero ===== */
+.hero{
+  background:linear-gradient(135deg,#8e44ad,#3498db);
+  color:#fff;text-align:center;padding:5rem 1rem;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+.hero h2{font-size:2.5rem;font-weight:700;margin-bottom:0.5rem;}
+.hero p{font-size:1.2rem;margin-bottom:1rem;}
+.hero button{
+  padding:0.7rem 1.5rem;font-size:1rem;border:none;border-radius:50px;
+  background:#fff;color:#5d4fb2;font-weight:600;cursor:pointer;transition:all 0.3s;
+}
+.hero button:hover{background:#ffeb3b;color:#222;transform:scale(1.05);}
+
+/* ===== Main ===== */
+main{max-width:1200px;margin:2rem auto;padding:0 1rem;}
+.books{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;}
+
+/* ===== Book Card ===== */
+.book-card{
+  background:#fff;border-radius:15px;padding:1rem;box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  transition:transform 0.3s, box-shadow 0.3s;position:relative;
+}
+.book-card:hover{transform:translateY(-8px);box-shadow:0 8px 25px rgba(0,0,0,0.15);}
+.book-card img{width:100%;border-radius:12px;margin-bottom:0.8rem;}
+.book-card h4{font-size:1.2rem;font-weight:600;}
+.book-card p{font-size:0.95rem;color:#555;margin-bottom:0.8rem;}
+.book-card button{
+  padding:0.5rem 1rem;border:none;border-radius:50px;background:#5d4fb2;color:#fff;cursor:pointer;font-weight:600;transition:all 0.3s;
+}
+.book-card button:hover{background:#483a8f;transform:scale(1.05);}
+
+/* ===== Reviews ===== */
+.reviews, .discussion{margin-top:1rem;text-align:left;}
+.reviews ul, .discussion ul{list-style:none;padding:0;max-height:200px;overflow-y:auto;}
+.reviews li, .discussion li{
+  background:#f4f4f4;padding:0.6rem;margin-bottom:0.5rem;border-radius:8px;
+  display:flex;justify-content:space-between;align-items:center;transition:background 0.3s;
+}
+.stars{color:#f5c518;margin-left:5px;}
+.like-btn,.reply-btn{
+  background:#5d4fb2;color:#fff;border:none;border-radius:5px;padding:0.2rem 0.5rem;margin-left:0.5rem;cursor:pointer;transition:background 0.3s;
+}
+.like-btn:hover,.reply-btn:hover{background:#483a8f;}
+.discussion-form{display:flex;gap:0.5rem;margin-top:0.5rem;}
+.discussion-form input{flex:1;padding:0.4rem;border:1px solid #ccc;border-radius:5px;}
+.discussion-form button{padding:0.4rem 0.8rem;border:none;background:#5d4fb2;color:#fff;border-radius:5px;cursor:pointer;transition:background 0.3s;}
+.discussion-form button:hover{background:#483a8f;}
+
+/* ===== Modal ===== */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;}
+.modal-content{background:#fff;padding:1.5rem;border-radius:15px;width:90%;max-width:450px;position:relative;animation:fadeIn 0.3s;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+.close-btn{position:absolute;top:10px;right:10px;background:#5d4fb2;color:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;}
+.close-btn:hover{background:#483a8f;}
+label{display:block;margin-top:0.5rem;}
+input[type=text], textarea, select{width:100%;padding:0.5rem;margin-top:0.3rem;border:1px solid #ccc;border-radius:8px;}
+textarea{resize:none;}
+
+/* ===== Footer ===== */
+footer{background:#5d4fb2;color:#fff;text-align:center;padding:1rem;margin-top:2rem;transition:background 0.3s;}
+
+/* ===== Dark Mode ===== */
+.dark-mode{background:#1e1e1e;color:#eee;}
+.dark-mode header, .dark-mode footer{background:#2c2c54;}
+.dark-mode .book-card,.dark-mode .reviews li,.dark-mode .discussion li{background:#2c2c2c;border-color:#444;}
+.dark-mode input,.dark-mode textarea,.dark-mode select{background:#444;color:#eee;border:1px solid #666;}
+
+/* ===== Responsive ===== */
+@media(max-width:600px){header{flex-direction:column;align-items:flex-start;}nav a{margin:0.5rem 0;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 Readers' Circle</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Books</a>
+    <a href="#">Discussions</a>
+    <a id="toggleDark">Dark Mode</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Discover, Rate & Discuss Your Favorite Books</h2>
+  <p>Join our community, share your reviews, and explore top-rated books!</p>
+  <button onclick="window.scrollTo({top:document.querySelector('.books').offsetTop, behavior:'smooth'})">Explore Books</button>
+</section>
+
+<main>
+  <section class="recommendations">
+    <h3>✨ Book Recommendations</h3>
+    <div class="books" id="bookContainer"></div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 Readers' Circle. All Rights Reserved.</p>
+</footer>
+
+<!-- Modal for Review -->
+<div class="modal" id="reviewModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <h3 id="modalBookTitle"></h3>
+    <label>Username:</label>
+    <input type="text" id="reviewUser" placeholder="Your Name">
+    <label>Review:</label>
+    <textarea id="reviewText" rows="3"></textarea>
+    <label>Rating:</label>
+    <select id="reviewRating">
+      <option value="1">1 Star</option>
+      <option value="2">2 Stars</option>
+      <option value="3">3 Stars</option>
+      <option value="4">4 Stars</option>
+      <option value="5">5 Stars</option>
+    </select>
+    <button style="margin-top:0.5rem;" onclick="submitReview()">Submit Review</button>
+  </div>
+</div>
+
+<script>
+const books=[
+  {title:"The Midnight Library",author:"Matt Haig",reviews:[],discussion:[]},
+  {title:"Atomic Habits",author:"James Clear",reviews:[],discussion:[]},
+  {title:"Pride and Prejudice",author:"Jane Austen",reviews:[],discussion:[]},
+  {title:"1984",author:"George Orwell",reviews:[],discussion:[]},
+  {title:"The Alchemist",author:"Paulo Coelho",reviews:[],discussion:[]}
+];
+const bookContainer=document.getElementById('bookContainer');
+const modal=document.getElementById('reviewModal');
+const modalBookTitle=document.getElementById('modalBookTitle');
+const reviewTextInput=document.getElementById('reviewText');
+const reviewRatingSelect=document.getElementById('reviewRating');
+const reviewUserInput=document.getElementById('reviewUser');
+let currentBook=null;
+
+function renderBooks(){
+  bookContainer.innerHTML='';
+  books.forEach((book,index)=>{
+    const card=document.createElement('div');
+    card.className='book-card';
+    card.innerHTML=`
+      <img src="https://via.placeholder.com/250x150.png?text=Book+Cover" alt="${book.title}">
+      <h4>${book.title}</h4>
+      <p>By ${book.author}</p>
+      <button onclick="openModal(${index})">Add Review</button>
+      <div class="reviews"><ul id="reviews-${index}"></ul></div>
+      <details class="discussion">
+        <summary>💬 Discussions</summary>
+        <ul id="discussion-${index}"></ul>
+        <div class="discussion-form">
+          <input type="text" placeholder="Your message" id="msg-${index}">
+          <button onclick="postMessage(${index})">Send</button>
+        </div>
+      </details>`;
+    bookContainer.appendChild(card);
+    renderReviews(index);
+    renderDiscussion(index);
+  });
+}
+
+function renderReviews(bookIndex){
+  const ul=document.getElementById(`reviews-${bookIndex}`);
+  ul.innerHTML='';
+  books[bookIndex].reviews.forEach((r,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<strong>${r.user}</strong>: ${r.text} 
+      <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+      <button class="like-btn" onclick="likeReview(${bookIndex},${i})">👍 ${r.likes}</button>`;
+    ul.appendChild(li);
+  });
+}
+
+function renderDiscussion(bookIndex){
+  const ul=document.getElementById(`discussion-${bookIndex}`);
+  ul.innerHTML='';
+  books[bookIndex].discussion.forEach(msg=>{
+    const li=document.createElement('li');
+    li.textContent=`${msg.user}: ${msg.text}`;
+    ul.appendChild(li);
+  });
+}
+
+function openModal(bookIndex){
+  currentBook=bookIndex;
+  modalBookTitle.textContent=books[bookIndex].title;
+  reviewTextInput.value='';
+  reviewUserInput.value='';
+  reviewRatingSelect.value=5;
+  modal.style.display='flex';
+}
+
+function closeModal(){ modal.style.display='none'; }
+
+function submitReview(){
+  const text=reviewTextInput.value.trim();
+  const user=reviewUserInput.value.trim()||'Anonymous';
+  const rating=parseInt(reviewRatingSelect.value);
+  if(!text){ alert("Please enter review text"); return; }
+  books[currentBook].reviews.push({user,text,rating,likes:0});
+  renderReviews(currentBook);
+  closeModal();
+}
+
+function likeReview(bookIndex,reviewIndex){
+  books[bookIndex].reviews[reviewIndex].likes+=1;
+  renderReviews(bookIndex);
+}
+
+function postMessage(bookIndex){
+  const input=document.getElementById(`msg-${bookIndex}`);
+  const text=input.value.trim();
+  if(!text) return;
+  books[bookIndex].discussion.push({user:'User',text});
+  renderDiscussion(bookIndex);
+  input.value='';
+}
+
+// Close modal by clicking outside
+window.onclick=function(e){if(e.target==modal) closeModal();}
+
+// Dark mode toggle
+document.getElementById('toggleDark').addEventListener('click',()=>{
+  document.body.classList.toggle('dark-mode');
+});
+
+// Initial render
+renderBooks();
+</script>
+
+</body>
+</html>
